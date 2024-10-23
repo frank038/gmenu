@@ -37,3 +37,6 @@ Features:
 
 Known issues:
 - the bookmarks sometimes cannot be reordered.
+
+![screenshot01](https://github.com/user-attachments/assets/17eac673-c39e-4550-b3b2-2a6c4054c4cd)
+
