@@ -33,7 +33,7 @@ Features:
 - update the menu in background;
 - right mouse click on an item to bookmark it (also for remove it)
 - middle mouse click (on an item) to force a menu rebuild;
-- the program closes after losing focus.
+- the program closes (hide state) after losing focus.
 
 Known issues:
 - the bookmarks sometimes cannot be reordered.
