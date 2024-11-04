@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# V. 0.5
+# V. 0.6
 # fifo commands: __open __close __exit
 
 import gi
@@ -222,8 +222,10 @@ class MainWindow(Gtk.Window):
         self.monitor3.connect("changed", self.directory_changed)
     
     def on_drag_data_get(self, widget, drag_context, data, info, time):
-        selected_path = widget.get_selected_items()[0]
-        self._start_path = selected_path
+        #
+        if self.get_cat_btn_name(self._btn_toggled) == "Bookmarks":
+            selected_path = widget.get_selected_items()[0]
+            self._start_path = selected_path
     
     def on_drag_data_received(self, widget, drag_context, x, y, data, info, time):
         _dest_path = widget.get_path_at_pos(x,y)
@@ -487,7 +489,7 @@ class MainWindow(Gtk.Window):
                 self.btn_bookmark = _btn
                 self.populate_bookmarks_at_start()
                 self.populate_category(el)
-                if USE_LABEL_CATEGORY == 1:
+                if USER_THEME == 1 and USE_LABEL_CATEGORY == 1:
                     self.clabel.set_label("Bookmarks")
     
     def on_toggle_toggled(self, btn, e=None):
@@ -766,6 +768,6 @@ class ynDialog(Gtk.Dialog):
 
 if __name__ == '__main__':
     _M = MainWindow()
-    _M.show_all()
+    # _M.show_all()
     Gtk.main()
     
