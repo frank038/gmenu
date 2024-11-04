@@ -18,6 +18,8 @@ The commands are:
 - echo "__close" > myfifo (hide the window, also with the key esc)
 - echo "__exit" > myfifo (close the program)
 
+This program starts in hidden state.
+
 Some options can be setted in the menusettings.py file.
 
 Features:
