@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-# V. 0.6
-# fifo commands: __open __close __exit
+# V. 0.9
+# fifo commands: __toggle __open __close __exit
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -81,7 +81,8 @@ class MainWindow(Gtk.Window):
         self.connect("delete-event", self._to_close)
         self.connect('hide', self.on_hide)
         self.connect('show', self.on_show)
-        self.connect('focus-out-event', self.on_lost_focus)
+        if CLOSE_FOCUS_LOST:
+            self.connect('focus-out-event', self.on_lost_focus)
         self.set_events(Gdk.EventMask.KEY_PRESS_MASK)
         self.connect('key-press-event', self.on_key_pressed)
         self.set_keep_above(True)
@@ -275,13 +276,6 @@ class MainWindow(Gtk.Window):
         else:
             return None
     
-    # # return the focused button
-    # def get_focused_btn(self):
-        # for btn in self.cbox:
-            # if btn.has_focus():
-                # return btn
-        # return None
-    
     def on_hide(self, e):
         self.iconview.unselect_all()
         self.searchentry.delete_text(0,-1)
@@ -357,7 +351,6 @@ class MainWindow(Gtk.Window):
                 _item = self.liststore[_path][6]
                 # remove from bookmarks
                 if _item in self.bookmarks:
-                    # if self._btn_toggled.get_tooltip_text() != "Bookmarks":
                     if self.get_cat_btn_name(self._btn_toggled) != "Bookmarks":
                         return
                     self.not_hide = 1
@@ -375,8 +368,7 @@ class MainWindow(Gtk.Window):
                             self.populate_category("Bookmarks")
                         except Exception as E:
                             self.msg_simple("Error\n"+str(E))
-                    # elif response == Gtk.ResponseType.CANCEL:
-                        # pass
+                    #
                     dialog.destroy()
                     self.not_hide = 0
                 # add to bookmarks
@@ -605,11 +597,9 @@ class MainWindow(Gtk.Window):
             #
             try:
                 if _item_path:
-                    # os.system("cd {} && {} -e {} & cd {}".format(str(_item_path), self.TERMINAL, str(_to_exec), os.getenv("HOME")))
                     _cmd = ['cd {} && {} -e {}'.format(str(_item_path),self.TERMINAL,str(_to_exec))]
                     self.execute_command(_cmd)
                 else:
-                    # os.system("cd {} && {} -e {}".format(os.getenv("HOME"), self.TERMINAL, str(_to_exec)))
                     _cmd = ['{} -e {}'.format(self.TERMINAL,str(_to_exec))]
                     self.execute_command(_cmd)
                 self.hide()
@@ -618,11 +608,9 @@ class MainWindow(Gtk.Window):
         else:
             try:
                 if _item_path:
-                    # os.system("cd {} && {} & cd {} &".format(str(_item_path), str(_to_exec), os.getenv("HOME")))
                     _cmd = ['cd {} && {}'.format(str(_item_path),str(_to_exec))]
                     self.execute_command(_cmd)
                 else:
-                    # os.system("cd {} && {} &".format(os.getenv("HOME"), str(_to_exec)))
                     _cmd = [str(_to_exec)]
                     self.execute_command(_cmd)
                 self.hide()
@@ -665,7 +653,12 @@ class appThread(Thread):
         while is_true:
             with open(FIFO) as fifo:
                 for line in fifo:
-                    if line.strip() == "__open":
+                    if line.strip() == "__toggle":
+                        if not self.win.is_visible():
+                            self.win.show_all()
+                        else:
+                            self.win.hide()
+                    elif line.strip() == "__open":
                         self.win.show_all()
                     elif line.strip() == "__close":
                         self.win.hide()
@@ -765,9 +758,7 @@ class ynDialog(Gtk.Dialog):
         self.show_all()
 
 
-
 if __name__ == '__main__':
     _M = MainWindow()
     # _M.show_all()
     Gtk.main()
-    
