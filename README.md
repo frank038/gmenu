@@ -14,6 +14,7 @@ Required:
 This program can be open and closed using a fifo file created
 in this program folder.
 The commands are:
+- echo "__toggle" > myfifo (toggle show/hide)
 - echo "__open" > myfifo (show the window)
 - echo "__close" > myfifo (hide the window, also with the key esc)
 - echo "__exit" > myfifo (close the program)
