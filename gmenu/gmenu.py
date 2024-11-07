@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# V. 0.9
+# V. 0.9.1
 # fifo commands: __toggle __open __close __exit
 
 import gi
@@ -39,7 +39,7 @@ if not os.path.exists(os.path.join(main_dir,"favorites")):
     # pass
 
 WWIDTH = WIN_WIDTH
-WEIGHT = WIN_EIGHT
+WEIGHT = WIN_HEIGHT
 
 ################### MENU
 
@@ -296,7 +296,9 @@ class MainWindow(Gtk.Window):
         if WIN_POSITION != "":
             self.move(int(self.WX),int(self.WY))
     
-    def _to_close(self):
+    def _to_close(self, w=None, e=None):
+        if w != None or e != None:
+            return
         if not self.event.is_set():
             self.event.set()
         time.sleep(1)
@@ -429,7 +431,7 @@ class MainWindow(Gtk.Window):
             self.perform_searching(self.searchentry.get_text().lower())
         
     def perform_searching(self, _text):
-        if USE_LABEL_CATEGORY == 1:
+        if USER_THEME == 1 and USE_LABEL_CATEGORY == 1:
             self.clabel.set_label("Searching...")
         _cat = ["Development", "Game", "Education", "Graphics", "Multimedia", "Network", "Office", "Utility", "Settings", "System", "Other"]
         _list = []

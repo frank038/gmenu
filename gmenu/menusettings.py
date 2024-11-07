@@ -16,7 +16,7 @@ LIVE_SEARCH=0
 SEARCH_N=3
 # window size
 WIN_WIDTH=880
-WIN_EIGHT=600
+WIN_HEIGHT=600
 # window position - "" for center - e.g. "100:100"
 WIN_POSITION=""
 # use css: 1 yes (suggested) - 0 no
