@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-# V. 0.9.1
+# V. 0.9.2
 # fifo commands: __toggle __open __close __exit
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk, Gio
+from gi.repository import Gtk, Gdk, Gio, GObject
 from gi.repository.GdkPixbuf import Pixbuf
 
 import os,sys,shutil
@@ -17,10 +17,27 @@ import signal
 
 from menusettings import *
 
+_display = Gdk.Display.get_default()
+display_type = GObject.type_name(_display.__gtype__)
+is_wayland = display_type=="GdkWaylandDisplay"
+if is_wayland:
+    gi.require_version('GtkLayerShell', '0.1')
+    from gi.repository import GtkLayerShell
+    ret = GtkLayerShell.is_supported()
+    if ret == False:
+        print("Error, layershell required.")
+        is_wayland = None
+    
+# is_x11 = display_type=="GdkX11Display"
+
 # program directory
 main_dir = os.getcwd()
 icon_dir = os.path.join(main_dir, "icons")
-FIFO = os.path.join(main_dir,'myfifo')
+
+if FIFOPATH != "" and os.path.exists(FIFOPATH):
+	FIFO = os.path.join(FIFOPATH,'myfifo')
+else:
+	FIFO = os.path.join(main_dir,'myfifo')
 
 if not os.path.exists(os.path.join(main_dir,"favorites")):
     _f = open(os.path.join(main_dir,"favorites"),"w")
@@ -85,14 +102,35 @@ class MainWindow(Gtk.Window):
             self.connect('focus-out-event', self.on_lost_focus)
         self.set_events(Gdk.EventMask.KEY_PRESS_MASK)
         self.connect('key-press-event', self.on_key_pressed)
-        self.set_keep_above(True)
-        if WIN_POSITION != "":
-            self.WX,self.WY = WIN_POSITION.split(":")
+        #
+        if is_wayland:
+            GtkLayerShell.init_for_window(self)
+            # GtkLayerShell.auto_exclusive_zone_enable(self)
+            GtkLayerShell.set_layer(self, GtkLayerShell.Layer.TOP)
+            GtkLayerShell.set_keyboard_mode(self, GtkLayerShell.KeyboardMode.ON_DEMAND)
+            if WPOS == 0:
+                GtkLayerShell.set_anchor(self, GtkLayerShell.Edge.LEFT, 1)
+                GtkLayerShell.set_anchor(self, GtkLayerShell.Edge.BOTTOM, 1)
+            elif WPOS == 1:
+                GtkLayerShell.set_anchor(self, GtkLayerShell.Edge.LEFT, 1)
+                GtkLayerShell.set_anchor(self, GtkLayerShell.Edge.TOP, 1)
+            elif WPOS == 2:
+                GtkLayerShell.set_anchor(self, GtkLayerShell.Edge.RIGHT, 1)
+                GtkLayerShell.set_anchor(self, GtkLayerShell.Edge.TOP, 1)
+            elif WPOS == 3:
+                GtkLayerShell.set_anchor(self, GtkLayerShell.Edge.RIGHT, 1)
+                GtkLayerShell.set_anchor(self, GtkLayerShell.Edge.BOTTOM, 1)
+            self.set_size_request(WIN_WIDTH,WIN_HEIGHT)
         else:
-            self.set_position(Gtk.WindowPosition.CENTER)
-        self.set_skip_pager_hint(True)
-        # self.set_skip_taskbar_hint(True)
-        self.set_decorated(False)
+            self.set_keep_above(True)
+            if WIN_POSITION != "":
+                self.WX,self.WY = WIN_POSITION.split(":")
+            else:
+                self.set_position(Gtk.WindowPosition.CENTER)
+            self.set_skip_pager_hint(True)
+            # self.set_skip_taskbar_hint(True)
+            self.set_decorated(False)
+        
         #
         self.TERMINAL = TERMINAL
         #
@@ -148,8 +186,11 @@ class MainWindow(Gtk.Window):
         self.iconview.connect("drag-data-get", self.on_drag_data_get)
         self.iconview.connect("drag-data-received", self.on_drag_data_received)
         #
+        if ACTIVATE_SINGLE == 1:
+	        self.iconview.set_activate_on_single_click(True)
         self.iconview.connect("item-activated", self.on_iv_item_activated)
         self.iconview.connect("button_press_event", self.mouse_event)
+        self.is_iconview_item_width_set = 0
         self.scrolledwindow.add(self.iconview)
         # separator
         separator = Gtk.Separator()
@@ -269,7 +310,7 @@ class MainWindow(Gtk.Window):
     
     # the label or the tooltip of the category button
     def get_cat_btn_name(self, btn):
-        if btn.get_label() != None:
+        if btn != None and btn.get_label() != None:
             return btn.get_label()
         elif btn.get_tooltip_text() != None:
             return btn.get_tooltip_text()
@@ -293,6 +334,11 @@ class MainWindow(Gtk.Window):
                 self.clabel.set_label("Bookmarks")
     
     def on_show(self, e):
+        if self.is_iconview_item_width_set == 0 and NUM_ITEMS != 0:
+            self.iconview.set_item_width(int(self.iconview.get_allocated_width()/NUM_ITEMS)+ITEMS_PAD)
+            self.is_iconview_item_width_set = 1
+        if is_wayland == 1:
+            return
         if WIN_POSITION != "":
             self.move(int(self.WX),int(self.WY))
     
@@ -356,7 +402,7 @@ class MainWindow(Gtk.Window):
                     if self.get_cat_btn_name(self._btn_toggled) != "Bookmarks":
                         return
                     self.not_hide = 1
-                    dialog = ynDialog(self, "Delete from Bookmarks?", "Question")
+                    dialog = ynDialog(self, "Remove from\nBookmarks?", "Question")
                     response = dialog.run()
                     if response == Gtk.ResponseType.OK:
                         _content = None
@@ -413,6 +459,10 @@ class MainWindow(Gtk.Window):
     # clear icon pressed in the search entry
     def on_icon_press(self, w, p, e):
         self.liststore.clear()
+        if self._btn_toggled:
+            if USER_THEME == 0:
+                self._btn_toggled.set_active(False)
+            self._btn_toggled = None
     
     # application searching by pressing enter in the search entry
     def on_button_search(self, button=None):
@@ -468,6 +518,9 @@ class MainWindow(Gtk.Window):
                 _btn.set_label(el)
             else:
                 _btn.set_tooltip_text(el)
+            if BTN_USE_LABEL_SIZE != 0:
+                _btn.set_property("width-request", BTN_USE_LABEL_SIZE)
+                _btn.set_property("height-request", BTN_USE_LABEL_SIZE)
             pix = Pixbuf.new_from_file_at_size(icon_dir+"/"+_icon[i], BTN_ICON_SIZE, BTN_ICON_SIZE)
             _image = Gtk.Image.new_from_pixbuf(pix)
             _btn.set_image(_image)
