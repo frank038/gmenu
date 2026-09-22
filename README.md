@@ -9,10 +9,10 @@ that lists all the programs installed, through the desktop files.
 Required:
 - python3
 - gtk3
-- Xorg
+- Xorg/Wayland
 
 This program can be open and closed using a fifo file created
-in this program folder.
+in this program folder or elsewhere if setted.
 The commands are:
 - echo "__toggle" > myfifo (toggle show/hide)
 - echo "__open" > myfifo (show the window)
