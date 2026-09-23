@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# V. 0.9.2
+# V. 0.9.3
 # fifo commands: __toggle __open __close __exit
 
 import gi
@@ -130,7 +130,6 @@ class MainWindow(Gtk.Window):
             self.set_skip_pager_hint(True)
             # self.set_skip_taskbar_hint(True)
             self.set_decorated(False)
-        
         #
         self.TERMINAL = TERMINAL
         #
@@ -401,6 +400,7 @@ class MainWindow(Gtk.Window):
                 if _item in self.bookmarks:
                     if self.get_cat_btn_name(self._btn_toggled) != "Bookmarks":
                         return
+                    self.hide()
                     self.not_hide = 1
                     dialog = ynDialog(self, "Remove from\nBookmarks?", "Question")
                     response = dialog.run()
@@ -421,6 +421,7 @@ class MainWindow(Gtk.Window):
                     self.not_hide = 0
                 # add to bookmarks
                 else:
+                    self.hide()
                     self.not_hide = 1
                     dialog = ynDialog(self, "Add to Bookmarks?", "Question")
                     response = dialog.run()
@@ -432,6 +433,7 @@ class MainWindow(Gtk.Window):
                                 _f.write("\n")
                             # rebuild bookmarks
                             self.populate_bookmarks_at_start()
+                            self.populate_category("Bookmarks")
                         except Exception as E:
                             self.msg_simple("Error\n"+str(E))
                     dialog.destroy()
@@ -614,6 +616,7 @@ class MainWindow(Gtk.Window):
                 except:
                     pixbuf = Pixbuf.new_from_file_at_scale(icon_dir+"/none.svg", ICON_SIZE, ICON_SIZE, 1)
         # icon name comment exec
+        pixbuf = pixbuf.scale_simple(ICON_SIZE, ICON_SIZE, 2)
         self.liststore.append([ pixbuf, el[0], el[3] or None, el[1], el[5], el[4], el[6] ])
     
     # execute a command

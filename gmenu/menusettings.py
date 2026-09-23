@@ -22,15 +22,15 @@ WIN_HEIGHT=600
 # under xorg, window position - "" for center - e.g. "100:100"
 WIN_POSITION=""
 # under wayland, window position: 0 bottom-left; 1 top-left; 2 top-right; 3 bottom-right
-WPOS=2
+WPOS=0
 # use css: 1 yes (suggested) - 0 no
 USE_CSS=1
-# fifo path - where the fifo file is: "" means default position; or "FULL PATH" (without /myfifo)
-FIFOPATH=""
+# fifo path - where the fifo file is: "" means default position; or "FULL PATH" (without /myfifo) - default: /tmp - change the bash scripts accordingly
+FIFOPATH="/tmp"
 # launch the applications with a single click: 0 no, 1 yes
 ACTIVATE_SINGLE=1
 # number of items in the view: 0 automatic; OR integer
-# may depends on the scale used too
+# may depends on the scale factor used too
 NUM_ITEMS=0
 # fine tuning of the item width: integer
 # for cosmetic purpose only
