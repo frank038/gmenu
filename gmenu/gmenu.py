@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# V. 0.9.4
+# V. 0.9.5
 # fifo commands: __toggle __open __close __exit
 
 import gi
@@ -638,14 +638,14 @@ class MainWindow(Gtk.Window):
         #
         _to_exec = self.liststore[rrow][3]
         # check the exec is in path
-        if not shutil.which(_to_exec):
-            dialog = ynDialog(self, "The exec\n{}\ncannot be found.\n Execute it anyway?".format(_to_exec), "Question")
-            response = dialog.run()
-            if response == Gtk.ResponseType.OK:
-                dialog.destroy()
-            elif response == Gtk.ResponseType.CANCEL:
-                dialog.destroy()
-                return
+        # if not shutil.which(_to_exec):
+        #     dialog = ynDialog(self, "The exec\n{}\ncannot be found.\n Execute it anyway?".format(_to_exec), "Question")
+        #     response = dialog.run()
+        #     if response == Gtk.ResponseType.OK:
+        #         dialog.destroy()
+        #     elif response == Gtk.ResponseType.CANCEL:
+        #         dialog.destroy()
+        #         return
         #
         _need_terminal = self.liststore[rrow][4]
         _item_path = self.liststore[rrow][5]
