@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# V. 0.9.3
+# V. 0.9.4
 # fifo commands: __toggle __open __close __exit
 
 import gi
@@ -111,15 +111,23 @@ class MainWindow(Gtk.Window):
             if WPOS == 0:
                 GtkLayerShell.set_anchor(self, GtkLayerShell.Edge.LEFT, 1)
                 GtkLayerShell.set_anchor(self, GtkLayerShell.Edge.BOTTOM, 1)
+                GtkLayerShell.set_margin(self, GtkLayerShell.Edge.LEFT, WMARGINX)
+                GtkLayerShell.set_margin(self, GtkLayerShell.Edge.BOTTOM, WMARGINY)
             elif WPOS == 1:
                 GtkLayerShell.set_anchor(self, GtkLayerShell.Edge.LEFT, 1)
                 GtkLayerShell.set_anchor(self, GtkLayerShell.Edge.TOP, 1)
+                GtkLayerShell.set_margin(self, GtkLayerShell.Edge.LEFT, WMARGINX)
+                GtkLayerShell.set_margin(self, GtkLayerShell.Edge.TOP, WMARGINY)
             elif WPOS == 2:
                 GtkLayerShell.set_anchor(self, GtkLayerShell.Edge.RIGHT, 1)
                 GtkLayerShell.set_anchor(self, GtkLayerShell.Edge.TOP, 1)
+                GtkLayerShell.set_margin(self, GtkLayerShell.Edge.RIGHT, WMARGINX)
+                GtkLayerShell.set_margin(self, GtkLayerShell.Edge.TOP, WMARGINY)
             elif WPOS == 3:
                 GtkLayerShell.set_anchor(self, GtkLayerShell.Edge.RIGHT, 1)
                 GtkLayerShell.set_anchor(self, GtkLayerShell.Edge.BOTTOM, 1)
+                GtkLayerShell.set_margin(self, GtkLayerShell.Edge.RIGHT, WMARGINX)
+                GtkLayerShell.set_margin(self, GtkLayerShell.Edge.BOTTOM, WMARGINY)
             self.set_size_request(WIN_WIDTH,WIN_HEIGHT)
         else:
             self.set_keep_above(True)

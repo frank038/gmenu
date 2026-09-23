@@ -23,6 +23,10 @@ WIN_HEIGHT=600
 WIN_POSITION=""
 # under wayland, window position: 0 bottom-left; 1 top-left; 2 top-right; 3 bottom-right
 WPOS=0
+# margins left or right in pixels (depends on WPOS)
+WMARGINX=0
+# margins bottom or top in pixels (depends on WPOS)
+WMARGINY=0
 # use css: 1 yes (suggested) - 0 no
 USE_CSS=1
 # fifo path - where the fifo file is: "" means default position; or "FULL PATH" (without /myfifo) - default: /tmp - change the bash scripts accordingly
