@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# V. 0.9.5
+# V. 0.9.6
 # fifo commands: __toggle __open __close __exit
 
 import gi
@@ -599,37 +599,45 @@ class MainWindow(Gtk.Window):
             return
         for el in globals()[cat_name]:
             self.on_populate_category(el)
+        #
+        adj = self.iconview.get_vadjustment()
+        adj.set_value(0.0)
+        self.iconview.set_vadjustment(adj)
             
     def on_populate_category(self, el):
         # label - executable - icon - comment - path - terminal - file full path
         if not os.path.exists(el[2]):
             try:
                 pixbuf = Gtk.IconTheme().load_icon(el[2], ICON_SIZE, Gtk.IconLookupFlags.FORCE_SVG)
+                pixbuf = pixbuf.scale_simple(ICON_SIZE, ICON_SIZE, 2)
             except:
                 try:
                     pixbuf = Gtk.IconTheme().load_icon("binary", ICON_SIZE, Gtk.IconLookupFlags.FORCE_SVG)
+                    pixbuf = pixbuf.scale_simple(ICON_SIZE, ICON_SIZE, 2)
                 except:
                     pixbuf = Pixbuf.new_from_file_at_scale(icon_dir+"/none.svg", ICON_SIZE, ICON_SIZE, 1)
             if pixbuf == None:
                 try:
                     pixbuf = Gtk.IconTheme().load_icon("binary", ICON_SIZE, Gtk.IconLookupFlags.FORCE_SVG)
+                    pixbuf = pixbuf.scale_simple(ICON_SIZE, ICON_SIZE, 2)
                 except:
                     pixbuf = Pixbuf.new_from_file_at_scale(icon_dir+"/none.svg", ICON_SIZE, ICON_SIZE, 1)
         else:
             try:
                 pixbuf = Pixbuf.new_from_file_at_scale(el[2], ICON_SIZE, ICON_SIZE, 1)
+                pixbuf = pixbuf.scale_simple(ICON_SIZE, ICON_SIZE, 2)
             except:
                 try:
                     pixbuf = Gtk.IconTheme().load_icon("binary", ICON_SIZE, Gtk.IconLookupFlags.FORCE_SVG)
+                    pixbuf = pixbuf.scale_simple(ICON_SIZE, ICON_SIZE, 2)
                 except:
                     pixbuf = Pixbuf.new_from_file_at_scale(icon_dir+"/none.svg", ICON_SIZE, ICON_SIZE, 1)
         # icon name comment exec
-        pixbuf = pixbuf.scale_simple(ICON_SIZE, ICON_SIZE, 2)
         self.liststore.append([ pixbuf, el[0], el[3] or None, el[1], el[5], el[4], el[6] ])
     
     # execute a command
     def execute_command(self, _cmd):
-        subprocess.Popen(_cmd, shell=True)
+        subprocess.Popen(_cmd, cwd=os.path.expanduser('~'), shell=True)
     
     # launch a program
     def on_iv_item_activated(self, iconview, widget):
