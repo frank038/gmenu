@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# V. 0.9.6
+# V. 0.9.7
 # fifo commands: __toggle __open __close __exit
 
 import gi
@@ -269,7 +269,11 @@ class MainWindow(Gtk.Window):
         gdir3 = Gio.File.new_for_path("/usr/local/share/applications")
         self.monitor3 = gdir3.monitor_directory(Gio.FileMonitorFlags.SEND_MOVED, None)
         self.monitor3.connect("changed", self.directory_changed)
-    
+        #
+        # if is_wayland == 0:
+        #     self.show_all()
+        #     self.hide()
+        
     def on_drag_data_get(self, widget, drag_context, data, info, time):
         #
         if self.get_cat_btn_name(self._btn_toggled) == "Bookmarks":
@@ -344,6 +348,15 @@ class MainWindow(Gtk.Window):
         if self.is_iconview_item_width_set == 0 and NUM_ITEMS != 0:
             self.iconview.set_item_width(int(self.iconview.get_allocated_width()/NUM_ITEMS)+ITEMS_PAD)
             self.is_iconview_item_width_set = 1
+        #
+        adj = self.iconview.get_vadjustment()
+        adj.set_value(0.0)
+        self.iconview.set_vadjustment(adj)
+        #
+        self.on_icon_press(None,None,None)
+        self.btn_bookmark.set_active(True)
+        self.on_toggle_toggled(self.btn_bookmark, None)
+        #
         if is_wayland == 1:
             return
         if WIN_POSITION != "":
@@ -571,6 +584,10 @@ class MainWindow(Gtk.Window):
         #
         self.populate_category(self.get_cat_btn_name(btn))
         self._btn_toggled = btn
+        #
+        adj = self.iconview.get_vadjustment()
+        adj.set_value(0.0)
+        self.iconview.set_vadjustment(adj)
     
     def populate_bookmarks_at_start(self):
         _content = None
@@ -591,7 +608,7 @@ class MainWindow(Gtk.Window):
         for eel in self.bookmarks:
             el = pop_menu_item.getMenu(eel).list
             Bookmarks.append([el[0],el[2],el[3],el[4],el[5],el[6],el[7]])
-        
+    
     def populate_category(self, cat_name):
         self.liststore.clear()
         #
@@ -599,11 +616,7 @@ class MainWindow(Gtk.Window):
             return
         for el in globals()[cat_name]:
             self.on_populate_category(el)
-        #
-        adj = self.iconview.get_vadjustment()
-        adj.set_value(0.0)
-        self.iconview.set_vadjustment(adj)
-            
+    
     def on_populate_category(self, el):
         # label - executable - icon - comment - path - terminal - file full path
         if not os.path.exists(el[2]):
