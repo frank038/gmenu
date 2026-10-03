@@ -4,11 +4,15 @@ that lists all the programs installed, through the desktop files.
 Required:
 - python3
 - gtk3
-- Xorg/Wayland
+- Xorg
+- Wayland (layershell)
 
 This program can be open and closed using a fifo file created
-in this program folder or elsewhere if setted.
-The commands are:
+in this program folder or elsewhere.
+This program can be managed using two bash script (that use the signals USR1 and USR2):
+- gmenu_toggle.sh (hides/shows and also starts this program)
+- gmenu_exit.sh (closes this program)
+If using the fifo (deprecated), the commands are:
 echo "__toggle" > myfifo (toggle show/hide)
 echo "__open" > myfifo (show the window)
 echo "__close" > myfifo (hide the window, also with the key esc)
@@ -28,7 +32,7 @@ Features:
               the other one is with toggle buttons as category selectors.
 - icon size;
 - fixed position or centered;
-- update the menu items in background;
+- update the menu in background;
 - right mouse click on an item to bookmark it (also for remove it)
 - middle mouse click (on an item) to force a menu rebuild;
 - the program closes (hide state) after losing focus.

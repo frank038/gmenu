@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
-# V. 0.9.7
-# fifo commands: __toggle __open __close __exit
+# V. 0.9.8
+
+# fifo commands (not recommended): __toggle __open __close __exit
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -34,10 +35,11 @@ if is_wayland:
 main_dir = os.getcwd()
 icon_dir = os.path.join(main_dir, "icons")
 
-if FIFOPATH != "" and os.path.exists(FIFOPATH):
-	FIFO = os.path.join(FIFOPATH,'myfifo')
-else:
-	FIFO = os.path.join(main_dir,'myfifo')
+if USE_FIFO == 1:
+    if FIFOPATH != "" and os.path.exists(FIFOPATH):
+	    FIFO = os.path.join(FIFOPATH,'myfifo')
+    else:
+	    FIFO = os.path.join(main_dir,'myfifo')
 
 if not os.path.exists(os.path.join(main_dir,"favorites")):
     _f = open(os.path.join(main_dir,"favorites"),"w")
@@ -84,9 +86,10 @@ System = []
 Utility = []
 Other = []
 
-# commands: __open __close __exit
-if not os.path.exists(FIFO):
-    os.mkfifo(FIFO)
+if USE_FIFO == 1:
+    # commands: __open __close __exit
+    if not os.path.exists(FIFO):
+        os.mkfifo(FIFO)
 
 USE_LABEL_CATEGORY=1
 
@@ -238,9 +241,10 @@ class MainWindow(Gtk.Window):
         # the last category button pressed
         self._btn_toggled = None
         #
-        self.event = Event()
-        self.thread_fifo = Thread(target=appThread, args=(self,self.event))
-        self.thread_fifo.start()
+        if USE_FIFO == 1:
+            self.event = Event()
+            self.thread_fifo = Thread(target=appThread, args=(self,self.event))
+            self.thread_fifo.start()
         # inhibit hiding
         self.not_hide = 0
         # # style
@@ -254,6 +258,8 @@ class MainWindow(Gtk.Window):
         # #
         signal.signal(signal.SIGINT, self.sigtype_handler)
         signal.signal(signal.SIGTERM, self.sigtype_handler)
+        if USE_FIFO == 0:
+            signal.signal(signal.SIGUSR1, self.sigtype_usr1)
         # # populate categories
         self.bookmarks = []
         self.set_categories()
@@ -708,6 +714,22 @@ class MainWindow(Gtk.Window):
         if sig == signal.SIGINT or sig == signal.SIGTERM:
             self._to_close()
     
+    def sigtype_usr1(self, sig, frame):
+        # toggle signal
+        if sig == signal.SIGUSR1:
+            if not self.is_visible():
+                self.show_all()
+            else:
+                self.hide()
+        # exit signal
+        elif sig == signal.SIGUSR2:
+            if not self.event.is_set():
+                os.kill(os.getpid(), signal.SIGTERM)
+                self.event.set()
+            #
+            self.destroy()
+            is_true = 0
+    
     # only yes message dialog
     def msg_simple(self, mmessage):
         messagedialog2 = Gtk.MessageDialog(parent=self,
@@ -768,8 +790,9 @@ class menuThread(Thread):
         self.run()
     
     def run(self):
-        if self.event.is_set():
-            return
+        if USE_FIFO == 1:
+            if self.event.is_set():
+                return
         if not self.q.empty():
             self.q.get_nowait()
             self.on_pop_menu()

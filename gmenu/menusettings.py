@@ -29,8 +29,6 @@ WMARGINX=0
 WMARGINY=0
 # use css: 1 yes (suggested) - 0 no
 USE_CSS=1
-# fifo path - where the fifo file is: "" means default position; or "FULL PATH" (without /myfifo) - default: /tmp - change the bash scripts accordingly
-FIFOPATH="/tmp"
 # launch the applications with a single click: 0 no, 1 yes
 ACTIVATE_SINGLE=1
 # number of items in the view: 0 automatic; OR integer
@@ -39,3 +37,7 @@ NUM_ITEMS=0
 # fine tuning of the item width: integer
 # for cosmetic purpose only
 ITEMS_PAD=0
+# use fifo to communicate with the program: 0 no (reccomended) - 1 yes
+USE_FIFO=0
+# fifo path - where the fifo file is: "" means default position; or "FULL PATH" (without /myfifo) - default: /tmp - change the bash scripts accordingly
+FIFOPATH="/tmp"
