@@ -14,7 +14,12 @@ Required:
 
 This program can be open and closed using a fifo file created
 in the /tmp folder or, better, elsewhere if setted.
-The commands are:
+
+This program can be managed using two bash script (that use the signals USR1 and USR2):
+- gmenu_toggle.sh (hides/shows and also starts this program)
+- gmenu_exit.sh (closes this program)
+
+If using the fifo (deprecated), the commands are:
 - echo "__toggle" > myfifo (toggle show/hide)
 - echo "__open" > myfifo (show the window)
 - echo "__close" > myfifo (hide the window, also with the key esc)
